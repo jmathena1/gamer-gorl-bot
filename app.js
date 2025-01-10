@@ -9,23 +9,41 @@ import {
 import * as steam from './steam.js';
 import { getRandomEmoji } from './utils.js';
 
+
 const app = express();
+const WEBHOOKS_URL = "https://25d5-174-172-91-168.ngrok-free.app/webhooks/"
 const PORT = process.env.PORT || 3000;
 
-async function sendDataToDiscord(data, interaction_id) {
+async function sendDataToDiscord(discordData, interaction_token) {
     let response = "";
     try {
         response = await axios({
             method: "post",
+            baseURL: WEBHOOKS_URL,
+            url: `${process.env.APP_ID}/${interaction_token}`,
+            params: {
+                type: CHANNEL_MESSAGE_WITH_SOURCE,
+                data: {
+                    content: discordData
+                }
+            }
         })
     }
+    catch {
+        return undefined
+    }
+    console.log(response);
+    return response;
 }
 
 app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async function (req, res) {
-    const { data, id, type } = req.body;
+    const { data, token, type } = req.body;
 
-    if (type === InteractionType.PING) {
-        return res.send({ type: InteractionResponseType.PONG });
+        if (type === InteractionType.PING) {
+        return res.send({
+            type: InteractionResponseType.PONG,
+            status: 204
+        });
     }
 
     if (type === InteractionType.APPLICATION_COMMAND) {
@@ -46,13 +64,10 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
                     content: "Wait a moment while we fetch the wishlist...",
                 },
             });
-            const wishlist = steam.displayWishlistGames(); 
-            return res.send ({
-                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                data: {
-                    content: wishlist
-                },
-            });
+            console.log(token);
+            const wishlist = await steam.displayWishlistGames(); 
+            await sendDataToDiscord(wishlist, token);
+            return "Wishlist sent!"; 
         }
     console.error(`unknown command: ${name}`);
     return res.status(400).json({ error: 'unknown command' });
