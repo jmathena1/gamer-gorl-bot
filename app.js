@@ -11,21 +11,20 @@ import { getRandomEmoji } from './utils.js';
 
 
 const app = express();
-const WEBHOOKS_URL = "https://25d5-174-172-91-168.ngrok-free.app/webhooks/"
+const WEBHOOKS_URL = "https://discord.com/api/v10/webhooks/"
 const PORT = process.env.PORT || 3000;
 
 async function sendDataToDiscord(discordData, interaction_token) {
     let response = "";
+    console.log(`${WEBHOOKS_URL}${process.env.APP_ID}/${interaction_token}`)
     try {
         response = await axios({
             method: "post",
             baseURL: WEBHOOKS_URL,
             url: `${process.env.APP_ID}/${interaction_token}`,
-            params: {
-                type: CHANNEL_MESSAGE_WITH_SOURCE,
-                data: {
-                    content: discordData
-                }
+            headers: {"Content-Type": "application/json"},
+            data : {
+                content: discordData
             }
         })
     }
@@ -64,7 +63,6 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
                     content: "Wait a moment while we fetch the wishlist...",
                 },
             });
-            console.log(token);
             const wishlist = await steam.displayWishlistGames(); 
             await sendDataToDiscord(wishlist, token);
             return "Wishlist sent!"; 

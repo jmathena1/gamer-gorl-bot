@@ -84,7 +84,7 @@ export async function displayWishlistGames() {
     for (const gameId of wishlistGameIds) {
         const gameDetails = await getGameDetails(gameId);
         if (gameDetails) {
-            allGameDetails.push`${gameDetails.name} selling for ${gameDetails.price_overview.final_formatted}`;
+            allGameDetails.push(`${gameDetails.name} selling for ${gameDetails.price_overview.final_formatted}`);
         }
     }
     return allGameDetails.join("\n");
