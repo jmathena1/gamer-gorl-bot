@@ -41,11 +41,11 @@ export async function getGameDetails(gameId) {
 	};
     const gameDetails = response.data[`${gameId}`].data;
     if (gameDetails.release_date.coming_soon === true) {
-        console.info("Game not yet released");
+        console.info(`${gameDetails.name} (app id: ${gameId}) not yet released`);
         return undefined;
     }
-    return (({name, price_overview: {final_formatted, discount_percent} }) =>
-        ({name, price_overview: {final_formatted, discount_percent} }))(gameDetails);
+    return (({name, price_overview: {final, final_formatted, discount_percent} }) =>
+        ({name, price_overview: {final, final_formatted, discount_percent} }))(gameDetails);
 }
 
 export async function getGamesOnSale(wishlistGamesIds) {
@@ -84,9 +84,16 @@ export async function displayWishlistGames() {
     for (const gameId of wishlistGameIds) {
         const gameDetails = await getGameDetails(gameId);
         if (gameDetails) {
-            allGameDetails.push(`${gameDetails.name} selling for ${gameDetails.price_overview.final_formatted}`);
+            allGameDetails.push(gameDetails);
         }
     }
-    return allGameDetails.join("\n");
+    allGameDetails.sort((gameOne, gameTwo) => {
+        return gameOne.price_overview.final - gameTwo.price_overview.final
+    });
+    let allGameMessages = [];
+    for (const gameDetail of allGameDetails) {
+        allGameMessages.push(`${gameDetail.name} selling for ${gameDetail.price_overview.final_formatted}`)
+    }
+    return allGameMessages.join("\n");
 }
 
