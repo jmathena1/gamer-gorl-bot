@@ -39,10 +39,7 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
     const { data, token, type } = req.body;
 
         if (type === InteractionType.PING) {
-        return res.send({
-            type: InteractionResponseType.PONG,
-            status: 204
-        });
+        return res.send({type: InteractionResponseType.PONG});
     }
 
     if (type === InteractionType.APPLICATION_COMMAND) {
