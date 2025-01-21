@@ -7,21 +7,23 @@ import {
   verifyKeyMiddleware,
 } from 'discord-interactions';
 import * as steam from './steam.js';
-import { getRandomEmoji } from './utils.js';
+import { getAppIdAndKey, getRandomEmoji } from './utils.js';
 
-
-const app = express();
 const WEBHOOKS_URL = "https://discord.com/api/v10/webhooks/"
 const PORT = process.env.PORT || 3000;
 
+const { appId, publicKey } = await getAppIdAndKey();
+
+const app = express();
+
 async function sendDataToDiscord(discordData, interaction_token) {
     let response = "";
-    console.log(`${WEBHOOKS_URL}${process.env.APP_ID}/${interaction_token}`)
+    console.log(`${WEBHOOKS_URL}${appId}/${interaction_token}`)
     try {
         response = await axios({
             method: "post",
             baseURL: WEBHOOKS_URL,
-            url: `${process.env.APP_ID}/${interaction_token}`,
+            url: `${appId}/${interaction_token}`,
             headers: {"Content-Type": "application/json"},
             data : {
                 content: discordData
@@ -35,10 +37,10 @@ async function sendDataToDiscord(discordData, interaction_token) {
     return response;
 }
 
-app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async function (req, res) {
+app.post('/interactions', verifyKeyMiddleware(publicKey), async function (req, res) {
     const { data, token, type } = req.body;
 
-        if (type === InteractionType.PING) {
+    if (type === InteractionType.PING) {
         return res.send({type: InteractionResponseType.PONG});
     }
 
@@ -73,5 +75,5 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
 });
 
 app.listen(PORT, () => {
-  console.log('Listening on port', PORT);
+    console.log('Listening on port', PORT);
 });
