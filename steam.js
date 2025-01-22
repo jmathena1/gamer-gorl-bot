@@ -97,3 +97,21 @@ export async function displayWishlistGames() {
     return allGameMessages.join("\n");
 }
 
+async function resolveVanityUrl(vanityUrl) {
+	let response = "";
+	try {
+		response = await axios({
+			method: "get",
+			baseURL: BASE_URL,
+			url: "ISteamUser/ResolveVanityURL/v1",
+			params: {
+				key: STEAM_API_KEY,
+				vanityUrl,
+			},
+		});
+	} catch {
+		return undefined;
+	}
+	return response.data.response?.steamid;
+}
+

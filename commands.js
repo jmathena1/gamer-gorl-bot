@@ -1,5 +1,14 @@
 import 'dotenv/config';
 import { capitalize, InstallGlobalCommands } from './utils.js';
+import { getCredential } from './credentials.js'
+
+const COMPARE_COMMAND = {
+    name: 'compare',
+    description: 'returns shared steam wishlist between specific users',
+    type: 1,
+    integration_types: [0, 1],
+    contexts: [0, 1, 2]
+};
 
 // Simple test command
 const TEST_COMMAND = {
@@ -12,15 +21,15 @@ const TEST_COMMAND = {
 
 const WISHLIST_COMMAND = {
     name: 'wishlist',
-    description: 'returns shared steam wishlist',
+    description: 'returns combined wishlist from all users',
     type: 1,
     integration_types: [0, 1],
     contexts: [0, 1, 2]
 };
 
-const ALL_COMMANDS = [TEST_COMMAND, WISHLIST_COMMAND];
+const ALL_COMMANDS = [COMPARE_COMMAND, TEST_COMMAND, WISHLIST_COMMAND];
 
 InstallGlobalCommands(
-    process.env.TEST_ENV ? process.env.TEST_APP_ID : process.env.APP_ID, 
+    getCredential("APP_ID"),
     ALL_COMMANDS
 );
