@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 export async function DiscordRequest(endpoint, options) {
     const url = 'https://discord.com/api/v10/' + endpoint;
-    const discordToken = process.env.TEST_ENV ? proccess.env.TEST_DISCORD_TOKEN : process.env.DISCORD_TOKEN;
+    const discordToken = process.env.TEST_ENV ? process.env.TEST_DISCORD_TOKEN : process.env.DISCORD_TOKEN;
     if (options.body) {
         options.body = JSON.stringify(options.body); 
     }

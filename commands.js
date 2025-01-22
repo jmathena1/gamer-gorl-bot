@@ -20,4 +20,7 @@ const WISHLIST_COMMAND = {
 
 const ALL_COMMANDS = [TEST_COMMAND, WISHLIST_COMMAND];
 
-InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);
+InstallGlobalCommands(
+    process.env.TEST_ENV ? process.env.TEST_APP_ID : process.env.APP_ID, 
+    ALL_COMMANDS
+);

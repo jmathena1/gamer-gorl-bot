@@ -47,6 +47,15 @@ app.post('/interactions', verifyKeyMiddleware(publicKey), async function (req, r
     if (type === InteractionType.APPLICATION_COMMAND) {
       const { name } = data;
 
+        if (name === 'compare') {
+            res.send({
+                type: InteractionResponseType.MODAL, 
+                data: {
+                    content: "Modal test",
+                    components: []
+                }
+            });
+        }
         if (name === 'test') {
             return res.send({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -76,4 +85,5 @@ app.post('/interactions', verifyKeyMiddleware(publicKey), async function (req, r
 
 app.listen(PORT, () => {
     console.log('Listening on port', PORT);
+    console.log(appId, publicKey);
 });
