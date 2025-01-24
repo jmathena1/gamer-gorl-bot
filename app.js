@@ -8,7 +8,7 @@ import {
 } from 'discord-interactions';
 
 import { getCredential } from './credentials.js'
-import { compareModalComponent } from './discord-components.js'
+import { compareComponent } from './discord-components.js'
 import * as steam from './steam.js';
 import { getRandomEmoji } from './utils.js';
 
@@ -22,7 +22,6 @@ const app = express();
 
 async function sendDataToDiscord(discordData, interaction_token) {
     let response = "";
-    console.log(`${WEBHOOKS_URL}${appId}/${interaction_token}`)
     try {
         response = await axios({
             method: "post",
@@ -56,18 +55,24 @@ app.post('/interactions', verifyKeyMiddleware(publicKey), async function (req, r
                 type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE, 
                 data: {
                     content: "Let's compare some wishlists!",
-                    components: compareModalComponent                 
+                    components: compareComponent                 
                 }
             });
-            return "let's compare";
+            return "Setting up user select options...";
         }
-        if (name === 'test') {
-            return res.send({
-            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-            data: {
-                content: `hello world ${getRandomEmoji()}`,
-            },
+        if (name === 'on-sale') {
+            res.send({
+                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                data: {
+                    content: "Wait a moment while we look for some deals..."
+                },
             });
+            const onSaleWishlist = await steam.displayWishlistGames(
+                await steam.combineWishlists(steam.STEAM_USER_IDS),
+                true
+            );
+            await sendDataToDiscord(onSaleWishlist, token);
+            return "On sale wishlist sent!";
         }
         if (name === 'wishlist') {
             res.send({
@@ -76,7 +81,9 @@ app.post('/interactions', verifyKeyMiddleware(publicKey), async function (req, r
                     content: "Wait a moment while we fetch the wishlist...",
                 },
             });
-            const wishlist = await steam.displayWishlistGames(); 
+            const wishlist = await steam.displayWishlistGames(
+                await steam.combineWishlists(steam.STEAM_USER_IDS)
+            );
             await sendDataToDiscord(wishlist, token);
             return "Wishlist sent!"; 
         }
@@ -85,13 +92,23 @@ app.post('/interactions', verifyKeyMiddleware(publicKey), async function (req, r
   }
 
   if (type === InteractionType.MESSAGE_COMPONENT) {
-      console.log(req.body);
+      const userChoices = data.values;
       res.send({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-          data: "Processing comparison request..."
-      })
-  };
-
+          data: {
+              content: `Comparing wishlists...`,
+          }
+      });
+      const usersToCompare = Object.fromEntries(
+          Object.entries(steam.STEAM_USER_LIST)
+            .filter(([name]) => userChoices.includes(name))
+      );
+      const comparedWishlist = await steam.displayWishlistGames(
+          await steam.combineWishlists(Object.values(usersToCompare), true)
+      );
+      await sendDataToDiscord(comparedWishlist, token);
+      return "Wishlist Comparison sent!";
+  }
   console.error('unknown interaction type', type);
   return res.status(400).json({ error: 'unknown interaction type' });
 });

@@ -4,8 +4,15 @@ import 'dotenv/config'
 const BASE_URL = "https://api.steampowered.com/";
 const GET_ITEMS_REQUEST_LIMIT = 700;
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
-const STEAM_USER_LIST = process.env.STEAM_USER_IDS.split(",");
 const STORE_URL = "https://store.steampowered.com/api/";
+
+export const STEAM_USER_LIST = {
+    'connor': process.env.CONNOR,
+    'courtney': process.env.COURTNEY,
+    'hollieanne': process.env.HOLLIEANNE,
+    'john': process.env.JOHN
+};
+export const STEAM_USER_IDS = Object.values(STEAM_USER_LIST);
 
 export async function getUserWishlistGameIds(steamUserId) {
 	let response = "";
@@ -56,37 +63,49 @@ export async function getGamesOnSale(wishlistGamesIds) {
            gamesOnSale.push(gameDetails)
        };
    }
+   if (gamesOnSale.length === 0) {
+        return "Gamer Gorl Bot did not find any games on sale";
+   }
    return gamesOnSale;
 };
 
-export async function combineWishlists() {
+export async function combineWishlists(userIds, match) {
     let combinedWishlistGameIds = [];
-    for (const user of STEAM_USER_LIST) {
-        const gameIds = await getUserWishlistGameIds(user);
+    for (const userId of userIds) {
+        const gameIds = await getUserWishlistGameIds(userId);
         if (gameIds) {
             combinedWishlistGameIds.push(...gameIds);
         };
     };
-    return combinedWishlistGameIds;
-}
-
-export async function displayGamesOnSale() {
-    const wishlistGameIds = await combineWishlists();
-    const onSaleGameDetails = await getGamesOnSale([...new Set(wishlistGameIds)]);
-    if (onSaleGameDetails.length === 0) {
-        return "Gamer Gorl Bot did not find any shared games on sale"
+    if (match === true) {
+        return combinedWishlistGameIds.filter(
+            (id, index) => combinedWishlistGameIds.indexOf(id) !== index);
     }
+    return [...new Set(combinedWishlistGameIds)];
 };
 
-export async function displayWishlistGames() {
+export async function displayWishlistGames(wishlistGameIds, onSale) {
     let allGameDetails = [];
-    const wishlistGameIds = await combineWishlists();
-    for (const gameId of wishlistGameIds) {
-        const gameDetails = await getGameDetails(gameId);
-        if (gameDetails) {
-            allGameDetails.push(gameDetails);
-        }
+    if (onSale === true) {
+        for (const gameId of wishlistGameIds) {
+            const gameDetails = await getGameDetails(gameId);
+            if (gameDetails && gameDetails.price_overview.discount_percent > 0) {
+                allGameDetails.push(gameDetails);
+            }
+        };
+    } else {
+        for (const gameId of wishlistGameIds) {
+            const gameDetails = await getGameDetails(gameId);
+            if (gameDetails) {
+                allGameDetails.push(gameDetails);
+            }
+        };
     }
+
+    if (allGameDetails.length === 0) {
+        return "No games found matching your request.";
+    }
+
     allGameDetails.sort((gameOne, gameTwo) => {
         return gameOne.price_overview.final - gameTwo.price_overview.final
     });

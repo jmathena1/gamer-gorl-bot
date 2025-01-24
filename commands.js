@@ -10,13 +10,12 @@ const COMPARE_COMMAND = {
     contexts: [0, 1, 2]
 };
 
-// Simple test command
-const TEST_COMMAND = {
-    name: 'test',
-    description: 'Basic command',
+const ONSALE_COMMAND = {
+    name: 'on-sale',
+    description: 'returns onsale games after comparing all users\' wishlists',
     type: 1,
     integration_types: [0, 1],
-    contexts: [0, 1, 2],
+    contexts: [0, 1, 2]
 };
 
 const WISHLIST_COMMAND = {
@@ -27,7 +26,7 @@ const WISHLIST_COMMAND = {
     contexts: [0, 1, 2]
 };
 
-const ALL_COMMANDS = [COMPARE_COMMAND, TEST_COMMAND, WISHLIST_COMMAND];
+const ALL_COMMANDS = [COMPARE_COMMAND, ONSALE_COMMAND, WISHLIST_COMMAND];
 
 InstallGlobalCommands(
     getCredential("APP_ID"),

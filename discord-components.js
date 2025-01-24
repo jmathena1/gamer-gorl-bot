@@ -1,4 +1,4 @@
-export const compareModalComponent = [
+export const compareComponent = [
     {
         "type": 1,
         "components": [
