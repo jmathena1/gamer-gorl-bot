@@ -1,6 +1,6 @@
 # gamerGorlBot
 
-[cat wearing gaming headphones with cat ears on top](gamer-gorl-bot.png)
+[cat wearing gaming headphones with cat ears on top](./gamer-gorl-bot.png)
 
 Gamer Gorl Bot is a Discord bot I built for my friends to let them compare each other's Steam wishlists.
 
