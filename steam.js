@@ -1,18 +1,12 @@
 import axios from "axios";
 import 'dotenv/config'
+import { STEAM_USER_LIST, STEAM_USER_IDS } from './config.js'
 
 const BASE_URL = "https://api.steampowered.com/";
-const GET_ITEMS_REQUEST_LIMIT = 700;
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 const STORE_URL = "https://store.steampowered.com/api/";
 
-export const STEAM_USER_LIST = {
-    'connor': process.env.CONNOR,
-    'courtney': process.env.COURTNEY,
-    'hollieanne': process.env.HOLLIEANNE,
-    'john': process.env.JOHN
-};
-
+export { STEAM_USER_LIST, STEAM_USER_IDS };
 export async function getUserWishlistGameIds(steamUserId) {
 	let response = "";
 	try {
