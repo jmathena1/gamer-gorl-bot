@@ -12,7 +12,6 @@ export const STEAM_USER_LIST = {
     'hollieanne': process.env.HOLLIEANNE,
     'john': process.env.JOHN
 };
-export const STEAM_USER_IDS = Object.values(STEAM_USER_LIST);
 
 export async function getUserWishlistGameIds(steamUserId) {
 	let response = "";
@@ -63,13 +62,10 @@ export async function getGamesOnSale(wishlistGamesIds) {
            gamesOnSale.push(gameDetails)
        };
    }
-   if (gamesOnSale.length === 0) {
-        return "Gamer Gorl Bot did not find any games on sale";
-   }
    return gamesOnSale;
 };
 
-export async function combineWishlists(userIds, match) {
+export async function combineWishlists(userIds) {
     let combinedWishlistGameIds = [];
     for (const userId of userIds) {
         const gameIds = await getUserWishlistGameIds(userId);
@@ -77,35 +73,25 @@ export async function combineWishlists(userIds, match) {
             combinedWishlistGameIds.push(...gameIds);
         };
     };
-    if (match === true) {
-        return combinedWishlistGameIds.filter(
-            (id, index) => combinedWishlistGameIds.indexOf(id) !== index);
-    }
     return [...new Set(combinedWishlistGameIds)];
+}
+
+export async function getOnSaleGameDetails() {
+    const wishlistGameIds = await combineWishlists(STEAM_WISH_LIST);
+    const onSaleGameDetails = await getGamesOnSale([...new Set(wishlistGameIds)]);
+    if (onSaleGameDetails.length === 0) {
+        return "Gamer Gorl Bot did not find any games on sale"
+    }
 };
 
-export async function displayWishlistGames(wishlistGameIds, onSale) {
+export async function displayWishlistGames(wishlistGameIds) {
     let allGameDetails = [];
-    if (onSale === true) {
-        for (const gameId of wishlistGameIds) {
-            const gameDetails = await getGameDetails(gameId);
-            if (gameDetails && gameDetails.price_overview.discount_percent > 0) {
-                allGameDetails.push(gameDetails);
-            }
-        };
-    } else {
-        for (const gameId of wishlistGameIds) {
-            const gameDetails = await getGameDetails(gameId);
-            if (gameDetails) {
-                allGameDetails.push(gameDetails);
-            }
-        };
+    for (const gameId of wishlistGameIds) {
+        const gameDetails = await getGameDetails(gameId);
+        if (gameDetails) {
+            allGameDetails.push(gameDetails);
+        }
     }
-
-    if (allGameDetails.length === 0) {
-        return "No games found matching your request.";
-    }
-
     allGameDetails.sort((gameOne, gameTwo) => {
         return gameOne.price_overview.final - gameTwo.price_overview.final
     });
