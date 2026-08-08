@@ -10,7 +10,6 @@ import {
 import { getCredential } from './credentials.js'
 import { compareComponent } from './discord-components.js'
 import * as steam from './steam.js';
-import { getRandomEmoji } from './utils.js';
 import { STEAM_USER_LIST } from './config'
 
 const WEBHOOKS_URL = "https://discord.com/api/v10/webhooks/"
