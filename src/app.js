@@ -11,9 +11,11 @@ import { getCredential } from './credentials.js'
 import { compareComponent } from './discord-components.js'
 import * as steam from './steam.js';
 import { getRandomEmoji } from './utils.js';
+import { STEAM_USER_LIST } from './config'
 
 const WEBHOOKS_URL = "https://discord.com/api/v10/webhooks/"
 const PORT = process.env.PORT || 3000;
+const STEAM_USER_IDS: string[] = Object.values(STEAM_USER_LIST)
 
 const appId = getCredential("APP_ID");
 const publicKey = getCredential("PUBLIC_KEY");

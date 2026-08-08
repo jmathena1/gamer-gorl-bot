@@ -12,7 +12,6 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "register": "tsc && node dist/commands.js",
-    "start": "node dist/app.js",
     "dev": "tsc --watch & node --watch  dist/app.js"
   },
   "author": "John Mathena",
