@@ -1,15 +1,18 @@
 import axios from "axios";
 import "dotenv/config";
 
+import { SteamWishlistEntry, WishlistGame } from "./types";
+
 const BASE_URL: string = "https://api.steampowered.com/";
 const GET_ITEMS_REQUEST_LIMIT: number = 700;
-const STEAM_API_KEY: string = process.env.STEAM_API_KEY;
+const STEAM_API_KEY: string | undefined = process.env.STEAM_API_KEY;
 const STORE_URL: string = "https://store.steampowered.com/api/";
 
-export async function getUserWishlistGameIds(steamUserId) {
-  let response = "";
+export async function getUserWishlistGameIds(
+  steamUserId: string,
+): Promise<number[] | []> {
   try {
-    response = await axios({
+    const response = await axios({
       method: "get",
       baseURL: BASE_URL,
       url: "IWishlistService/GetWishlist/v1",
@@ -17,19 +20,23 @@ export async function getUserWishlistGameIds(steamUserId) {
         steamid: steamUserId,
       },
     });
-  } catch {
-    return undefined;
+    return response.data.response.items?.map(
+      (game: SteamWishlistEntry) => game.appid,
+    );
+  } catch (error) {
+    console.error(
+      `Failed to fetch wishlist game ids for user ${steamUserId}:`,
+      error,
+    );
+    return [];
   }
-  const userWishlistGameIds = response.data.response.items?.map(
-    (game) => game.appid,
-  );
-  return userWishlistGameIds;
 }
 
-export async function getGameDetails(gameId) {
-  let response = "";
+export async function getGameDetails(
+  gameId: number,
+): Promise<WishlistGame | string | undefined> {
   try {
-    response = await axios({
+    const response = await axios({
       method: "get",
       baseURL: STORE_URL,
       url: "appdetails",
@@ -37,27 +44,27 @@ export async function getGameDetails(gameId) {
         appids: gameId,
       },
     });
-  } catch {
+    const gameData = response.data[`${gameId}`];
+    if (!gameData) {
+      console.warn(`No data found for game ${gameId}`);
+      return undefined;
+    }
+
+    const gameDetails: WishlistGame = gameData.data;
+
+    if (gameDetails.release_date?.coming_soon === true) {
+      console.info(`${gameDetails.name} (app id: ${gameId}) not yet released`);
+      return undefined;
+    }
+
+    console.info(
+      `Getting details for ${gameDetails.name} (app id: ${gameId})...`,
+    );
+    return gameDetails;
+  } catch (error) {
+    console.error(`Failed to fetch details for game id ${gameId}:`, error);
     return undefined;
   }
-  const gameDetails = response.data[`${gameId}`].data;
-  if (gameDetails.release_date.coming_soon === true) {
-    console.info(`${gameDetails.name} (app id: ${gameId}) not yet released`);
-    return undefined;
-  }
-  console.info(
-    `Getting details for ${gameDetails.name} (app id: ${gameId})...`,
-  );
-  if (gameDetails.price_overview) {
-    return (({
-      name,
-      price_overview: { final, final_formatted, discount_percent },
-    }) => ({
-      name,
-      price_overview: { final, final_formatted, discount_percent },
-    }))(gameDetails);
-  }
-  return gameDetails.name;
 }
 
 export async function getGamesOnSale(wishlistGamesIds) {

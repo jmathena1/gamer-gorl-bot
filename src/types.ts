@@ -1,6 +1,6 @@
 // --- Steam API DTOs ---
 export interface SteamWishlistEntry {
-  appId: number;
+  appid: number;
   name: string;
   priceCents: number;
   discountPercent: number;
@@ -8,13 +8,20 @@ export interface SteamWishlistEntry {
 }
 
 export interface WishlistGame {
-  appId: number;
+  steam_appid: number;
   name: string;
-  originalPrice: string;
-  salePrice: string;
-  discountPercent: number;
-  isOnSale: boolean;
-  wantedBy: string[];
+  release_date: {
+    coming_soon: boolean;
+    date: string;
+  };
+  price_overview?: {
+    discount_percent: number;
+    final: number;
+    initial: number;
+    final_formatted: string;
+    initial_formatted: string;
+    currency: string;
+  };
 }
 
 // --- User / Config ---
