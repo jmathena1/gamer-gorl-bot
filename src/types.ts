@@ -59,3 +59,8 @@ export interface BotCommand {
 export interface BotContext {
   sendFollowup: (content: string, token: string) => Promise<void>;
 }
+
+export interface CommandRegistration {
+  name: string;
+  description: string;
+}

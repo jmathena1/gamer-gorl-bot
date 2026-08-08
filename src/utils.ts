@@ -1,4 +1,5 @@
 import "dotenv/config";
+import type { CommandRegistration } from "./types";
 import { getCredential } from "./credentials";
 
 interface DiscordRequestOptions extends Omit<RequestInit, "body"> {
@@ -28,13 +29,18 @@ export async function DiscordRequest(
   return response;
 }
 
-export async function InstallGlobalCommands(appId, commands) {
+export async function InstallGlobalCommands(
+  appId: string,
+  commands: CommandRegistration[],
+): Promise<void> {
   // API endpoint to overwrite global commands
   const endpoint = `applications/${appId}/commands`;
   try {
-    // This is calling the bulk overwrite endpoint: https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
-    await DiscordRequest(endpoint, { method: "PUT", body: commands });
+    await DiscordRequest(endpoint, {
+      method: "PUT",
+      body: commands,
+    });
   } catch (err) {
-    console.error(err);
+    console.error("Failed to install global commands:", err);
   }
 }
