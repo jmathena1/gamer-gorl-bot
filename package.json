@@ -9,9 +9,11 @@
     "node": ">=18.x"
   },
   "scripts": {
-    "start": "node app.js",
-    "register": "node commands.js",
-    "dev": "nodemon app.js"
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "register": "tsc && node dist/commands.js",
+    "start": "node dist/app.js",
+    "dev": "tsc --watch & node --watch  dist/app.js"
   },
   "author": "John Mathena",
   "license": "MIT",
