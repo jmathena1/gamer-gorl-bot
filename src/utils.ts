@@ -8,19 +8,21 @@ export async function DiscordRequest(
   endpoint: string,
   options: DiscordRequestOptions,
 ): Promise<Response> {
-  const url: string  = `https://discord.com/api/v10/${endpoint}`;
+  const url: string = `https://discord.com/api/v10/${endpoint}`;
   const response = await fetch(url, {
-    ...options
+    ...options,
     headers: {
       Authorization: `Bot ${getCredential("DISCORD_TOKEN")}`,
       "Content-Type": "application/json; charset=UTF-8",
       "User-Agent": "GamerGorlBot (https://github.com/jmathena/gamer-gorl-bot)",
     },
-    body: options.body ? JSON.stringify(options.body): undefined,
+    body: options.body ? JSON.stringify(options.body) : undefined,
   });
 
   if (!response.ok) {
-    throw new Error(`Error fetching ${endpoint}: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Error fetching ${endpoint}: ${response.status} ${response.statusText}`,
+    );
   }
 
   return response;
